@@ -1,6 +1,6 @@
 import sqlite3
 import bcrypt
-from fastapi import APIRouter,Depends,HTTPException,status
+from fastapi import APIRouter,Depends,HTTPException,status,Form
 from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials
 from pydantic import BaseModel
 import jwt
@@ -54,31 +54,46 @@ def user_add(user_data:Add_user):
     connection.close()
     return {"message":"user added"}
 
+from fastapi import HTTPException, Form
+
 @router.post("/login")
-def user_login(username:str,password:str):
-    connection=sqlite3.connect("inventory.db")
-    cursor=connection.cursor()
-    cursor.execute("SELECT id,username,password_hash FROM users WHERE username=?",(username,))
-    user_row=cursor.fetchone()
+def user_login(
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    connection = sqlite3.connect("inventory.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "SELECT id, username, password_hash FROM users WHERE username=?",
+        (username,)
+    )
+
+    user_row = cursor.fetchone()
 
     if user_row is None:
-        return "Login failed"
-    
-    stored_hash=user_row[2]
-    password_byte=password.encode('utf-8')
+        connection.close()
+        return {"message": "Login failed"}
 
-    if bcrypt.checkpw(password_byte,stored_hash):
-        user_id=user_row[0]
-        user_name=user_row[1]
-        token=generate_token(user_id,user_name)
+    stored_hash = user_row[2]
+    password_byte = password.encode("utf-8")
+
+    if bcrypt.checkpw(password_byte, stored_hash):
+        user_id = user_row[0]
+        user_name = user_row[1]
+
+        token = generate_token(user_id, user_name)
+
+        connection.close()
+
         return {
-            "message":"login success",
-            "access_token":token,
-            "token_type":"Bearer"
-            }
-    else:
-        return {"message":"invalid credentials"}
+            "message": "login success",
+            "access_token": token,
+            "token_type": "Bearer"
+        }
 
+    connection.close()
+    return {"message": "invalid credentials"}
 
 def generate_token(user_id:int,user_name:str):
 #payload creation
