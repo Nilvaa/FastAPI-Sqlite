@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import sqlite3
 from pydantic import BaseModel
+from user_auth import router
 
 app=FastAPI()
 
@@ -8,9 +9,7 @@ app=FastAPI()
 def home():
     return {"message":"hello"}
 
-
-
-
+app.include_router(router,prefix="/auth")
 
 def create_table():
     connection=sqlite3.connect("inventory.db")
@@ -20,7 +19,8 @@ def create_table():
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     category TEXT NOT NULL, 
-    quanitity INTEGER NOT NULL)
+    quantity INTEGER NOT NULL,
+    price INTEGER NOT NULL);
     """
     cursor.execute(table)
     print("table created")
@@ -31,7 +31,8 @@ create_table()
 class Insert_data(BaseModel):
     name:str
     category:str
-    quanitity:int
+    quantity:int
+    price:int
 
 @app.post("/products/")
 def add_product(product_data:Insert_data):
@@ -39,9 +40,10 @@ def add_product(product_data:Insert_data):
         cursor=connection.cursor()
         name=product_data.name
         category=product_data.category
-        quanitity=product_data.quanitity
-        new_data=(name,category,quanitity)
-        cursor.execute("INSERT INTO products(name,category,quanitity) VALUES(?,?,?)",new_data)
+        quantity=product_data.quantity
+        price=product_data.price
+        new_data=(name,category,quantity,price)
+        cursor.execute("INSERT INTO products(name,category,quantity,price) VALUES(?,?,?,?)",new_data)
         connection.commit()
         connection.close()
         return {"message":"added"}
@@ -61,14 +63,14 @@ def view_products():
 
 
 class Update_item(BaseModel):
-     quanitity:int
+     quantity:int
 @app.put("/update_product/{item_id}")
 def update_item(product_data:Update_item,item_id:int):
      connection=sqlite3.connect("inventory.db")
      cursor=connection.cursor()
-     quanitity=product_data.quanitity
-     data=(quanitity,item_id)
-     cursor.execute("UPDATE products SET quanitity=? WHERE id=?",(data))
+     quantity=product_data.quantity
+     data=(quantity,item_id)
+     cursor.execute("UPDATE products SET quantity=? WHERE id=?",(data))
      connection.commit()
      cursor.execute("SELECT * FROM products")
      data=cursor.fetchall()
