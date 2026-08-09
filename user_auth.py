@@ -25,7 +25,8 @@ def user_table():
         CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
+        password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'user'
         );
         """
         cursor.execute(table) 
@@ -65,7 +66,7 @@ def user_login(
     cursor = connection.cursor()
 
     cursor.execute(
-        "SELECT id, username, password_hash FROM users WHERE username=?",
+        "SELECT id, username, password_hash,role FROM users WHERE username=?",
         (username,)
     )
 
@@ -73,7 +74,10 @@ def user_login(
 
     if user_row is None:
         connection.close()
-        return {"message": "Login failed"}
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username/password"
+        )
 
     stored_hash = user_row[2]
     password_byte = password.encode("utf-8")
@@ -81,8 +85,9 @@ def user_login(
     if bcrypt.checkpw(password_byte, stored_hash):
         user_id = user_row[0]
         user_name = user_row[1]
+        user_role=user_row[3]
 
-        token = generate_token(user_id, user_name)
+        token = generate_token(user_id, user_name,user_role)
 
         connection.close()
 
@@ -93,13 +98,17 @@ def user_login(
         }
 
     connection.close()
-    return {"message": "invalid credentials"}
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid username/password"
+    )
 
-def generate_token(user_id:int,user_name:str):
+def generate_token(user_id:int,user_name:str,user_role:str):
 #payload creation
     payload={
         "userId":user_id,
         "userName":user_name,
+        "userRole":user_role,
         "exp":datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=60)
     }
     secret_key=SECRET_KEY

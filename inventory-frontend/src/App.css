@@ -143,3 +143,36 @@ button:hover {
 .logout-button {
   margin-bottom: 20px;
 }
+
+.logout-button{
+   margin-top: 40px;
+}
+
+.admin-form {
+  width: 400px;
+  margin: 25px auto;
+  padding: 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.admin-form h3 {
+  margin-bottom: 15px;
+}
+
+.admin-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.admin-form button {
+  margin-top: 5px;
+}

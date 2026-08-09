@@ -49,7 +49,7 @@ function Signup() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <br /><br />
+        <br/><br />
 
         <button type="submit">Signup</button>
       </form>
