@@ -68,22 +68,42 @@ class Update_item(BaseModel):
 @app.patch("/update_product/{item_id}")
 def update_item(product_data:Update_item,item_id:int,current_user:dict=Depends(decode_verify_token)):
      user_role=current_user["userRole"]
-     if user_role=="admin":
-          connection=get_connection()
-          cursor=connection.cursor()
-          if product_data.quantity is not None or product_data.quantity !=0:
-               cursor.execute("UPDATE products SET quantity=%s WHERE id=%s",(product_data.quantity,item_id))
-          if product_data.price is not None or product_data.price!=0:
-               cursor.execute("UPDATE products SET price=%s WHERE id=%s",(product_data.price,item_id))
-          connection.commit()
-          connection.close()
-          return {"message":"updated"}
-     else:
+     if user_role !="admin":
           raise HTTPException(
                status_code=403,
                detail="admin access required"
           )
-
+     if product_data.quantity is not None:
+          if product_data.quantity <= 0:
+               raise HTTPException(
+               status_code=400,
+               detail="invalid quantity"
+               )
+          connection=get_connection()
+          cursor=connection.cursor()
+          cursor.execute("UPDATE products SET quantity=%s WHERE id=%s",(product_data.quantity,item_id))     
+          connection.commit()
+          connection.close()
+          return {"message":"quantity updated"}
+               
+     if product_data.price is not None:
+          if product_data.price <= 0:
+               raise HTTPException(
+                    status_code=400,
+                    detail="invalid quantity"
+                    )
+          connection=get_connection()
+          cursor=connection.cursor()
+          cursor.execute("UPDATE products SET price=%s WHERE id=%s",(product_data.price,item_id))     
+          connection.commit()
+          connection.close()
+          return {"message":"price updated"}
+          
+     raise HTTPException(
+          status_code=400,
+          detail="provide quantity or price"
+     )
+          
      
 @app.delete("/delete_product/{item_id}")
 def delete_product(item_id:int,current_user:dict=Depends(decode_verify_token)):
