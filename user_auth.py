@@ -1,4 +1,3 @@
-import sqlite3
 import bcrypt
 from fastapi import APIRouter,Depends,HTTPException,status,Form
 from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials
@@ -7,6 +6,7 @@ import jwt
 import datetime
 import os
 from dotenv import load_dotenv
+from database import get_connection
 
 load_dotenv()
 SECRET_KEY=os.getenv("SECRET_KEY")
@@ -17,26 +17,6 @@ print("SECRET KEY loaded")
 security=HTTPBearer()
 router=APIRouter()
 
-def user_table():
-    try:
-        connection=sqlite3.connect("inventory.db")
-        cursor=connection.cursor()
-        table="""
-        CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        role TEXT DEFAULT 'user'
-        );
-        """
-        cursor.execute(table) 
-        connection.commit()
-        connection.close()
-        print("user table created")  
-    except Exception as e:
-        print("exception",e)
-        
-user_table() 
 
 class Add_user(BaseModel):
     username:str
@@ -48,9 +28,9 @@ def user_add(user_data:Add_user):
     password=user_data.password
     passwordHash=password.encode('utf-8')
     hashed_password=bcrypt.hashpw(passwordHash,bcrypt.gensalt())
-    connection=sqlite3.connect("inventory.db")
+    connection=get_connection()
     cursor=connection.cursor()
-    cursor.execute("INSERT INTO users (username,password_hash) VALUES (?,?)",(username,hashed_password))
+    cursor.execute("INSERT INTO users (username,password_hash) VALUES (%s,%s)",(username,hashed_password))
     connection.commit()
     connection.close()
     return {"message":"user added"}
@@ -62,11 +42,11 @@ def user_login(
     username: str = Form(...),
     password: str = Form(...)
 ):
-    connection = sqlite3.connect("inventory.db")
+    connection = get_connection()
     cursor = connection.cursor()
 
     cursor.execute(
-        "SELECT id, username, password_hash,role FROM users WHERE username=?",
+        "SELECT id, username, password_hash,role FROM users WHERE username=%s",
         (username,)
     )
 
@@ -79,7 +59,7 @@ def user_login(
             detail="Invalid username/password"
         )
 
-    stored_hash = user_row[2]
+    stored_hash = bytes(user_row[2])
     password_byte = password.encode("utf-8")
 
     if bcrypt.checkpw(password_byte, stored_hash):
