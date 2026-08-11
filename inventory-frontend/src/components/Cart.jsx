@@ -1,61 +1,113 @@
 import { useEffect, useState } from "react";
 
 function Cart({ onBackToProducts }) {
-  const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
+    const [cart, setCart] = useState([]);
 
-  const fetchCart = async () => {
+    useEffect(() => {
+        fetchCart();
+    }, []);
+
+    const fetchCart = async () => {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:8000/view_cart",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            console.log("Cart response:", data);
+
+            if (response.ok) {
+                setCart(data.data || []);
+            } else {
+                alert(data.detail || "Failed to load cart");
+                setCart([]);
+            }
+
+        } catch (error) {
+            console.error("Cart error:", error);
+            setCart([]);
+            alert("Could not connect to backend");
+        }
+    };
+
+  const deleteCart = async (productId) => {
     const token = localStorage.getItem("token");
 
-    const response = await fetch("http://127.0.0.1:8000/view_cart", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/delete_cart/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      setCart(data.cart);
-    } else {
-      alert("Failed to load cart");
-    }
-  };
-
-  const deleteCart = async (cartId) => {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(
-      `http://127.0.0.1:8000/delete_cart/${cartId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      if (response.ok) {
+        fetchCart();
+      } else {
+        alert(data.detail || "Failed to delete item");
       }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert(data.message);
-      fetchCart();
-    } else {
-      alert(data.detail || "Failed to delete item");
+    } catch (error) {
+      console.error(error);
+      alert("Could not connect to backend");
     }
   };
 
   return (
-    <div className="section">
-      <h2>My Cart</h2>
+    <div className="page-card">
+
+      <div className="page-header">
+        <div>
+          <h2>My Cart</h2>
+
+          <p className="page-description">
+            Review the products you've added.
+          </p>
+        </div>
+
+        <button
+          className="back-button"
+          onClick={onBackToProducts}
+        >
+          ← Continue Shopping
+        </button>
+      </div>
 
       {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
+
+        <div className="empty-cart">
+          <div className="empty-cart-icon">
+            🛒
+          </div>
+
+          <h3>Your cart is empty</h3>
+
+          <p>
+            Add some products to get started.
+          </p>
+
+          <button onClick={onBackToProducts}>
+            Browse Products
+          </button>
+        </div>
+
       ) : (
+
         <table className="data-table">
+
           <thead>
             <tr>
               <th>Product</th>
@@ -69,24 +121,35 @@ function Cart({ onBackToProducts }) {
           <tbody>
             {cart.map((item) => (
               <tr key={item[0]}>
-                <td>{item[1]}</td>
-                <td>{item[2]}</td>
-                <td>₹{item[3]}</td>
-                <td>{item[4]}</td>
+
                 <td>
-                  <button onClick={() => deleteCart(item[0])}>
+                  <strong>{item[1]}</strong>
+                </td>
+
+                <td>{item[2]}</td>
+
+                <td>
+                  <strong>₹{item[3]}</strong>
+                </td>
+
+                <td>{item[4]}</td>
+
+                <td>
+                  <button
+                    className="delete-button"
+                    onClick={() => deleteCart(item[0])}
+                  >
                     Delete
                   </button>
                 </td>
+
               </tr>
             ))}
           </tbody>
+
         </table>
       )}
 
-      <button className="back-button" onClick={onBackToProducts}>
-        Back to Products
-      </button>
     </div>
   );
 }

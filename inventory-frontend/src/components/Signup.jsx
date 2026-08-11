@@ -8,53 +8,80 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("http://127.0.0.1:8000/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    });
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        }
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      setMessage(data.message);
-    } else {
-      setMessage("Signup failed");
+      if (response.ok) {
+        setMessage(data.message);
+        setUsername("");
+        setPassword("");
+      } else {
+        setMessage(data.detail || "Signup failed");
+      }
+    } catch (error) {
+      setMessage("Could not connect to backend");
     }
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
+    <div className="auth-form">
+
+      <h2>Create Account</h2>
+      <p className="form-subtitle">
+        Sign up to manage your inventory
+      </p>
 
       <form onSubmit={handleSignup}>
+
+        <label>Username</label>
+
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Enter username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
         />
 
-        <br /><br />
+        <label>Password</label>
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
-        <br/><br />
+        <button
+          type="submit"
+          className="primary-button"
+        >
+          Sign Up
+        </button>
 
-        <button type="submit">Signup</button>
       </form>
 
-      <p>{message}</p>
+      {message && (
+        <p className="message">
+          {message}
+        </p>
+      )}
+
     </div>
   );
 }
