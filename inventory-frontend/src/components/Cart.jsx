@@ -9,35 +9,35 @@ function Cart({ onBackToProducts }) {
     }, []);
 
     const fetchCart = async () => {
-        const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-        try {
-            const response = await fetch(
-                "http://127.0.0.1:8000/view_cart",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            const data = await response.json();
-
-            console.log("Cart response:", data);
-
-            if (response.ok) {
-                setCart(data.data || []);
-            } else {
-                alert(data.detail || "Failed to load cart");
-                setCart([]);
+    try {
+        const response = await fetch(
+            "http://127.0.0.1:8000/view_cart",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             }
+        );
 
-        } catch (error) {
-            console.error("Cart error:", error);
+        const data = await response.json();
+
+        console.log("Cart response:", data);
+
+        if (response.ok) {
+            setCart(data.cart || []);
+        } else {
+            alert(data.detail || "Failed to load cart");
             setCart([]);
-            alert("Could not connect to backend");
         }
-    };
+
+    } catch (error) {
+        console.error("Cart error:", error);
+        setCart([]);
+        alert("Could not connect to backend");
+    }
+};
 
   const deleteCart = async (productId) => {
     const token = localStorage.getItem("token");

@@ -34,31 +34,36 @@ function Products({ onGoToCart }) {
   };
 
   const addToCart = async (productId) => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/add_to_cart/${productId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Product added to cart");
-      } else {
-        alert(data.detail || "Failed to add product");
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/add_cart",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          pdt_id: productId,
+          quantity: 1,
+        }),
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Could not connect to backend");
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message || "Product added to cart");
+    } else {
+      alert(data.detail || data.message || "Failed to add product");
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Could not connect to backend");
+  }
+};
 
   return (
     <div className="page-card">
