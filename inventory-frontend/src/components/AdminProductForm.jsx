@@ -20,6 +20,7 @@ function AdminProductForm({ mode, product, onBack }) {
     isEdit ? product[4] : ""
   );
 
+  const [image,setImage]=useState(null)
   const [loading, setLoading] = useState(false);
 
   // -------------------------
@@ -34,32 +35,41 @@ function AdminProductForm({ mode, product, onBack }) {
     setLoading(true);
 
     try {
+      const formData=new FormData()
+      formData.append("name",name)
+      formData.append("category",category)
+      formData.append("quantity",quantity)
+      formData.append("price",price)
+      formData.append("image",image)
+
+      console.log("Form data:")
+      for (const [key,value] of formData.entries()){
+        console.log(key,value);
+        
+      }
+
       const response = await fetch(
         "http://127.0.0.1:8000/products/",
         {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
 
-          body: JSON.stringify({
-            name: name,
-            category: category,
-            quantity: Number(quantity),
-            price: Number(price),
-          }),
+          body: formData,
         }
       );
 
       const data = await response.json();
+      console.log("status :",response.status)
+      console.log("backend response :",JSON.stringify(data,null,2))
 
       if (response.ok) {
         alert("Product added successfully");
         onBack();
       } else {
-        alert(data.detail || "Failed to add product");
+        alert(JSON.stringify(data,null,2));
       }
 
     } catch (error) {
@@ -210,6 +220,15 @@ function AdminProductForm({ mode, product, onBack }) {
               required
             />
 
+          </div>
+
+          <div className="form-group">
+            <label>Product Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e)=>setImage(e.target.files[0])}
+              required={!isEdit}/>
           </div>
 
           {/* BUTTONS */}

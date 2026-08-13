@@ -104,6 +104,7 @@ function AdminPanel({
     <div className="page-card">
 
       {/* HEADER */}
+      
 
       <div className="page-header">
 
@@ -136,6 +137,7 @@ function AdminPanel({
 
             <tr>
               <th>ID</th>
+              <th>Image</th>
               <th>Name</th>
               <th>Category</th>
               <th>Stock</th>
@@ -152,7 +154,7 @@ function AdminPanel({
               <tr>
 
                 <td
-                  colSpan="6"
+                  colSpan="7"
                   className="no-products"
                 >
                   No products available
@@ -168,6 +170,13 @@ function AdminPanel({
 
                   <td>
                     #{product[0]}
+                  </td>
+                  <td>
+                    {product[5]?(
+                      <img src={`http://127.0.0.1:8000/uploads/${product[5]}`} alt={product[1]} className="product-image" />
+                    ):(
+                      <span>No Image</span>
+                    )}
                   </td>
 
                   <td>
@@ -195,6 +204,8 @@ function AdminPanel({
                     </strong>
 
                   </td>
+
+                  
 
                   <td>
 
@@ -236,16 +247,7 @@ function AdminPanel({
 
       {/* LOGOUT */}
 
-      <div className="admin-footer">
-
-        <button
-          className="logout-button"
-          onClick={onLogout}
-        >
-          Logout
-        </button>
-
-      </div>
+      
 
     </div>
   );

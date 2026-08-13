@@ -110,6 +110,7 @@ function Cart({ onBackToProducts }) {
 
           <thead>
             <tr>
+              <th>Image</th>
               <th>Product</th>
               <th>Category</th>
               <th>Price</th>
@@ -121,7 +122,14 @@ function Cart({ onBackToProducts }) {
           <tbody>
             {cart.map((item) => (
               <tr key={item[0]}>
-
+                <td>{item[5]?(
+                  <img
+        src={`http://127.0.0.1:8000/uploads/${item[5]}`}
+        alt={item[1]}
+        className="cart-product-image"/>
+                ):(
+                  <span>No image</span>
+                )}</td>
                 <td>
                   <strong>{item[1]}</strong>
                 </td>

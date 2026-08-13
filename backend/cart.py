@@ -45,20 +45,31 @@ def add_to_cart(cart_data:Add_to_cart,current_user:dict=Depends(decode_verify_to
             return {"message":"invalid quantity/insuffient stock"}
 
 @cart_router.get("/view_cart")
-def view_cart(current_user:dict=Depends(decode_verify_token)):
-    connection=get_connection()
-    cursor=connection.cursor()
-    user_id=current_user["userId"]
+def view_cart(current_user: dict = Depends(decode_verify_token)):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    user_id = current_user["userId"]
+
     cursor.execute("""
-    SELECT cart.id, products.name, products.category,
-           products.price, cart.quantity
-    FROM products
-    JOIN cart ON products.id = cart.pdt_id
-    WHERE cart.user_id=%s
-""", (user_id,))
-    user_cart_row=cursor.fetchall()
+        SELECT
+            cart.id,
+            products.name,
+            products.category,
+            products.price,
+            cart.quantity,
+            products.image
+        FROM products
+        JOIN cart ON products.id = cart.pdt_id
+        WHERE cart.user_id = %s
+    """, (user_id,))
+
+    user_cart_row = cursor.fetchall()
+
     connection.close()
-    return {"cart":user_cart_row}
+
+    return {"cart": user_cart_row}
 
 @cart_router.delete("/delete_cart/{cart_id}")
 def delete_cart(cart_id:int,current_user:dict=Depends(decode_verify_token)):

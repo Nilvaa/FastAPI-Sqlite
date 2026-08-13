@@ -1,13 +1,14 @@
-from fastapi import FastAPI,Depends,HTTPException
-from pydantic import BaseModel
-from user_auth import router,decode_verify_token
-from cart import cart_router
+from fastapi import FastAPI, Depends, HTTPException, Form, UploadFile,File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from user_auth import router, decode_verify_token
+from cart import cart_router
 from database import get_connection
 
 app=FastAPI()
 
-
+app.mount("/uploads",StaticFiles(directory="uploads"),name="uploads")
 app.add_middleware(
      CORSMiddleware,
      allow_origins=["http://localhost:5173"],
@@ -30,28 +31,60 @@ class Insert_data(BaseModel):
     price:int
 
 @app.post("/products/")
-def add_product(product_data:Insert_data,current_user:dict=Depends(decode_verify_token)):
+async def add_product(
+     name:str=Form(...),
+     category:str=Form(...),
+     quantity:int=Form(...),
+     price:int=Form(...),
+     image:UploadFile=File(...),
+     current_user:dict=Depends(decode_verify_token)
+):
         user_role=current_user["userRole"]
-        if user_role=="admin":
-             connection=get_connection()
-             cursor=connection.cursor()
-             name=product_data.name
-             category=product_data.category
-             quantity=product_data.quantity
-             price=product_data.price
-             new_data=(name,category,quantity,price)
-             cursor.execute("INSERT INTO products(name,category,quantity,price) VALUES(%s,%s,%s,%s)",new_data)
-             connection.commit()
-             connection.close()
-             return {"message":"added"}
-        else:
+        if user_role!="admin":
              raise HTTPException(
                   status_code=403,
                   detail="admin access required"
              )
-                     
-        
+        if quantity <=0:
+             raise HTTPException(
+                  status_code=400,
+                  detail="invalid Quantity"
+             )
+        if price <=0:
+            raise HTTPException(
+            status_code=400,
+            detail="invalid Quantity"
+            )        
+        allowed_types=["image/jpeg","image/png","image/webp"]
 
+        if image.content_type not in allowed_types:
+             raise HTTPException(
+                  status_code=400,
+                  detail="Only JPG, PNG and WEBP images are allowed"
+             )
+        #save image
+        image_path=f"uploads/{image.filename}"
+
+        with open(image_path,"wb") as buffer:
+             buffer.write(await image.read())
+
+        connection=get_connection()
+        cursor=connection.cursor()
+
+        cursor.execute(
+             """
+                INSERT INTO products
+                (name,category,quantity,price,image)
+                VALUES(%s,%s,%s,%s,%s)
+             """,
+             (name,category,quantity,price,image.filename)
+        )
+        connection.commit()
+        connection.close()
+        return {
+             "message":"image uploaded",
+             "image":image.filename
+        }
 @app.get("/view_products")
 def view_products(current_user:dict=Depends(decode_verify_token)):
      connection=get_connection()

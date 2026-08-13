@@ -1,5 +1,5 @@
 import sqlite3
-from database import get_connection
+from backend.database import get_connection
 
 sqlite_conn=sqlite3.connect("inventory.db")
 sqlite_cursor=sqlite_conn.cursor()

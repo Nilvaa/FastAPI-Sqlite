@@ -15,15 +15,9 @@ function App() {
   );
 
   const [showCart, setShowCart] = useState(false);
-
   const [authPage, setAuthPage] = useState("login");
 
-  // Admin pages:
-  // dashboard
-  // add
-  // edit
   const [adminPage, setAdminPage] = useState("dashboard");
-
   const [editProduct, setEditProduct] = useState(null);
 
   const handleLogin = () => {
@@ -90,32 +84,58 @@ function App() {
   }
 
   // -------------------------
-  // GET USER ROLE
+  // GET USER DETAILS
   // -------------------------
 
   const token = localStorage.getItem("token");
   const decodedToken = jwtDecode(token);
 
+  const isAdmin = decodedToken.userRole === "admin";
+
+  // Change these according to the actual key in your JWT
+  const username =
+    decodedToken.username ||
+    decodedToken.name ||
+    decodedToken.userName ||
+    (isAdmin ? "Admin" : "User");
+
   // -------------------------
   // ADMIN
   // -------------------------
 
-  if (decodedToken.userRole === "admin") {
+  if (isAdmin) {
 
     // ADMIN DASHBOARD
     if (adminPage === "dashboard") {
       return (
         <div className="app">
 
+          {/* MAIN HEADER */}
           <div className="main-header">
+
             <div>
               <h1>Inventory Management System</h1>
               <p>Admin Dashboard</p>
             </div>
+
+            <div className="header-right">
+
+              <span className="username">
+                👤 {username}
+              </span>
+
+              <button
+                className="logout-button"
+                onClick={logout}
+              >
+                Logout
+              </button>
+
+            </div>
+
           </div>
 
           <AdminPanel
-            onLogout={logout}
             onAddProduct={() => setAdminPage("add")}
             onEditProduct={(product) => {
               setEditProduct(product);
@@ -127,16 +147,33 @@ function App() {
       );
     }
 
-    // ADD PRODUCT PAGE
+    // ADD PRODUCT
     if (adminPage === "add") {
       return (
         <div className="app">
 
           <div className="main-header">
+
             <div>
               <h1>Inventory Management System</h1>
               <p>Admin Dashboard</p>
             </div>
+
+            <div className="header-right">
+
+              <span className="username">
+                👤 {username}
+              </span>
+
+              <button
+                className="logout-button"
+                onClick={logout}
+              >
+                Logout
+              </button>
+
+            </div>
+
           </div>
 
           <AdminProductForm
@@ -148,16 +185,33 @@ function App() {
       );
     }
 
-    // EDIT PRODUCT PAGE
+    // EDIT PRODUCT
     if (adminPage === "edit") {
       return (
         <div className="app">
 
           <div className="main-header">
+
             <div>
               <h1>Inventory Management System</h1>
               <p>Admin Dashboard</p>
             </div>
+
+            <div className="header-right">
+
+              <span className="username">
+                👤 {username}
+              </span>
+
+              <button
+                className="logout-button"
+                onClick={logout}
+              >
+                Logout
+              </button>
+
+            </div>
+
           </div>
 
           <AdminProductForm
@@ -181,11 +235,29 @@ function App() {
   return (
     <div className="app">
 
+      {/* MAIN HEADER */}
       <div className="main-header">
+
         <div>
           <h1>Inventory Management System</h1>
           <p>User Dashboard</p>
         </div>
+
+        <div className="header-right">
+
+          <span className="username">
+            👤 {username}
+          </span>
+
+          <button
+            className="logout-button"
+            onClick={logout}
+          >
+            Logout
+          </button>
+
+        </div>
+
       </div>
 
       {!showCart ? (
@@ -197,15 +269,6 @@ function App() {
           onBackToProducts={() => setShowCart(false)}
         />
       )}
-
-      <div className="logout-container">
-        <button
-          className="logout-button"
-          onClick={logout}
-        >
-          Logout
-        </button>
-      </div>
 
     </div>
   );
