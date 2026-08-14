@@ -106,7 +106,7 @@ function Cart({ onBackToProducts }) {
 
       ) : (
 
-        <table className="data-table">
+        <table className="data-table cart-table">
 
           <thead>
             <tr>
