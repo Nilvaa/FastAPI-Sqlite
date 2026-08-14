@@ -30,8 +30,13 @@ def user_add(user_data: Add_user):
     hashed_password = bcrypt.hashpw(passwordHash, bcrypt.gensalt()).decode('utf-8')  # ← added .decode('utf-8')
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO users (username,password_hash) VALUES (%s,%s)", (username, hashed_password))
-    connection.commit()
+    cursor.execute(
+    """
+    INSERT INTO users (username, password_hash, role)
+    VALUES (%s, %s, %s)
+    """,
+    (username, hashed_password, "user")
+)
     connection.close()
     return {"message": "user added"}
 

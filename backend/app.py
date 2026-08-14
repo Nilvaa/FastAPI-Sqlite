@@ -11,18 +11,16 @@ app=FastAPI()
 app.mount("/uploads",StaticFiles(directory="uploads"),name="uploads")
 app.add_middleware(
      CORSMiddleware,
-    #  allow_origins=[
-    #     "http://localhost:5173",
-    #     "https://fast-api-sqlite-kx4xc6vus-avlinantony26-9259s-projects.vercel.app"
-    # ],
+      allow_origins=[
+        "https://fast-api-sqlite.vercel.app",
+        "https://fast-api-sqlite-kx4xc6vus-avlinantony26-9259s-projects.vercel.app",
+        "http://localhost:5173"
+    ],
      
-    # allow_credentials=True,
-    # allow_methods=["*"],
-    # allow_headers=["*"],
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    
 )
 @app.get("/")
 def home():
