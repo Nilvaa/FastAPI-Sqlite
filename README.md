@@ -1,6 +1,6 @@
 # Inventory Management System
 
-LIVE LINK- fast-api-sqlite.vercel.app
+LIVE LINK- (https://fast-api-sqlite.vercel.app/)
 A full-stack Inventory Management System built using React, FastAPI, and PostgreSQL.
 
 The application provides separate dashboards for administrators and normal users. Administrators can manage products and inventory, while users can browse products and manage their shopping cart.
