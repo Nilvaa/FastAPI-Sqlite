@@ -8,6 +8,15 @@ psql_conn=get_connection()
 psql_cursor=psql_conn.cursor()
 
 try:
+    # USERS
+    psql_cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users(
+            id SERIAL PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL
+        );
+    """)
     psql_cursor.execute("""
         CREATE TABLE IF NOT EXISTS products(
             id SERIAL PRIMARY KEY,
