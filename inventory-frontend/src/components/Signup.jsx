@@ -25,16 +25,16 @@ function Signup() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        setMessage(data.message);
-        setUsername("");
-        setPassword("");
-      } else {
-        setMessage(data.detail || "Signup failed");
-      }
-    } catch (error) {
-      setMessage("Could not connect to backend");
+       if (response.ok) {
+        alert(data.message||"Signup sucess");
+    } else {
+        alert(data.detail || "Signup failed");
     }
+
+} catch (error) {
+    console.error("Signup error:", error);
+    alert("Could not connect to backend");
+}
   };
 
   return (
