@@ -1,7 +1,7 @@
 import sqlite3
-from backend.database import get_connection
+from database import get_connection
 
-sqlite_conn=sqlite3.connect("inventory.db")
+sqlite_conn=sqlite3.connect("backend/inventory.db")
 sqlite_cursor=sqlite_conn.cursor()
 
 psql_conn=get_connection()
