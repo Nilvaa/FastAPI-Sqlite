@@ -23,17 +23,17 @@ class Add_user(BaseModel):
     password:str
 
 @router.post("/signup")
-def user_add(user_data:Add_user):
-    username=user_data.username
-    password=user_data.password
-    passwordHash=password.encode('utf-8')
-    hashed_password=bcrypt.hashpw(passwordHash,bcrypt.gensalt())
-    connection=get_connection()
-    cursor=connection.cursor()
-    cursor.execute("INSERT INTO users (username,password_hash) VALUES (%s,%s)",(username,hashed_password))
+def user_add(user_data: Add_user):
+    username = user_data.username
+    password = user_data.password
+    passwordHash = password.encode('utf-8')
+    hashed_password = bcrypt.hashpw(passwordHash, bcrypt.gensalt()).decode('utf-8')  # ← added .decode('utf-8')
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO users (username,password_hash) VALUES (%s,%s)", (username, hashed_password))
     connection.commit()
     connection.close()
-    return {"message":"user added"}
+    return {"message": "user added"}
 
 from fastapi import HTTPException, Form
 
@@ -64,7 +64,11 @@ def user_login(
     if isinstance(stored_hash, memoryview):
         stored_hash = stored_hash.tobytes()
     elif isinstance(stored_hash, str):
-        stored_hash = stored_hash.encode("utf-8")
+        if stored_hash.startswith('\\x'):
+        # Postgres bytea hex-text representation — decode it properly
+            stored_hash = bytes.fromhex(stored_hash[2:])
+        else:
+            stored_hash = stored_hash.encode("utf-8")
 
     password_byte = password.encode("utf-8")
 
