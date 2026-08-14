@@ -61,7 +61,9 @@ def user_login(
 
     stored_hash = user_row[2]
 
-    if isinstance(stored_hash, str):
+    if isinstance(stored_hash, memoryview):
+        stored_hash = stored_hash.tobytes()
+    elif isinstance(stored_hash, str):
         stored_hash = stored_hash.encode("utf-8")
 
     password_byte = password.encode("utf-8")
