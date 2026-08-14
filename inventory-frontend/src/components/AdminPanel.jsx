@@ -23,7 +23,7 @@ function AdminPanel({
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_APP_URL}/view_products`,
+        `${import.meta.env.VITE_API_URL}/view_products`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ function AdminPanel({
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_APP_URL}/delete_product/${productId}`,
+        `${import.meta.env.VITE_API_URL}/delete_product/${productId}`,
         {
           method: "DELETE",
 
@@ -173,7 +173,7 @@ function AdminPanel({
                   </td>
                   <td>
                     {product[5]?(
-                      <img src={`${import.meta.env.VITE_APP_URL}/uploads/${product[5]}`} alt={product[1]} className="product-image" />
+                      <img src={`${import.meta.env.VITE_API_URL}/uploads/${product[5]}`} alt={product[1]} className="product-image" />
                     ):(
                       <span>No Image</span>
                     )}

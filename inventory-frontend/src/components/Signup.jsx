@@ -10,7 +10,7 @@ function Signup() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_APP_URL}/auth/signup`,
+        `${import.meta.env.VITE_API_URL}/auth/signup`,
         {
           method: "POST",
           headers: {

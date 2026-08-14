@@ -19,7 +19,7 @@ function Products({ onGoToCart }) {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_APP_URL}/view_products`,
+        `${import.meta.env.VITE_API_URL}/view_products`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ function Products({ onGoToCart }) {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_APP_URL}/add_cart`,
+        `${import.meta.env.VITE_API_URL}/add_cart`,
         {
           method: "POST",
 
@@ -156,7 +156,7 @@ function Products({ onGoToCart }) {
 
           {product[5] ? (
             <img
-              src={`${import.meta.env.VITE_APP_URL}/uploads/${product[5]}`}
+              src={`${import.meta.env.VITE_API_URL}/uploads/${product[5]}`}
               alt={product[1]}
               className="product-card-image"
             />
