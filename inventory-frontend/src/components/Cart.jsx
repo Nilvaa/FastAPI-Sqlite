@@ -124,7 +124,7 @@ function Cart({ onBackToProducts }) {
               <tr key={item[0]}>
                 <td>{item[5]?(
                   <img
-        src={`http://127.0.0.1:8000/uploads/${item[5]}`}
+        src={`{$import.meta.env.VITE_API_URL}/uploads/${item[5]}`}
         alt={item[1]}
         className="cart-product-image"/>
                 ):(
