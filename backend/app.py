@@ -13,7 +13,6 @@ app.add_middleware(
      CORSMiddleware,
       allow_origins=[
         "https://fast-api-sqlite.vercel.app",
-        "https://fast-api-sqlite-kx4xc6vus-avlinantony26-9259s-projects.vercel.app",
         "http://localhost:5173"
     ],
      
