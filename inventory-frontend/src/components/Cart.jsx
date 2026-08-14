@@ -105,57 +105,37 @@ function Cart({ onBackToProducts }) {
         </div>
 
       ) : (
+       <div className="cart-products">
+    {cart.map((item) => (
+        <div className="cart-product-card" key={item[0]}>
 
-        <table className="data-table cart-table">
+            <div className="cart-product-image">
+                <img
+                    src={`${import.meta.env.VITE_API_URL}/uploads/${item[5]}`}
+                    alt={item[1]}
+                />
+            </div>
 
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+            <div className="cart-product-info">
+                <h3>{item[1]}</h3>
+                <p className="category">{item[2]}</p>
 
-          <tbody>
-            {cart.map((item) => (
-              <tr key={item[0]}>
-                <td>{item[5]?(
-                  <img
-        src={`{$import.meta.env.VITE_API_URL}/uploads/${item[5]}`}
-        alt={item[1]}
-        className="cart-product-image"/>
-                ):(
-                  <span>No image</span>
-                )}</td>
-                <td>
-                  <strong>{item[1]}</strong>
-                </td>
+                <div className="cart-product-details">
+                    <span>₹{item[3]}</span>
+                    <span>Quantity: {item[4]}</span>
+                </div>
+            </div>
 
-                <td>{item[2]}</td>
+            <button
+                className="delete-btn"
+                onClick={() => deleteCartItem(item[0])}
+            >
+                Delete
+            </button>
 
-                <td>
-                  <strong>₹{item[3]}</strong>
-                </td>
-
-                <td>{item[4]}</td>
-
-                <td>
-                  <button
-                    className="delete-button"
-                    onClick={() => deleteCart(item[0])}
-                  >
-                    Delete
-                  </button>
-                </td>
-
-              </tr>
-            ))}
-          </tbody>
-
-        </table>
+        </div>
+    ))}
+</div>
       )}
 
     </div>
