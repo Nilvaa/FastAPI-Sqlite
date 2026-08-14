@@ -13,7 +13,7 @@ function Cart({ onBackToProducts }) {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/view_cart",
+            `${import.meta.env.VITE_APP_URL}/view_cart`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ function Cart({ onBackToProducts }) {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/delete_cart/${productId}`,
+        `${import.meta.env.VITE_APP_URL}/delete_cart/${productId}`,
         {
           method: "DELETE",
           headers: {

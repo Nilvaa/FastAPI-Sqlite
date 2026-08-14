@@ -49,7 +49,7 @@ function AdminProductForm({ mode, product, onBack }) {
       }
 
       const response = await fetch(
-        "http://127.0.0.1:8000/products/",
+        `${import.meta.env.VITE_APP_URL}/products/`,
         {
           method: "POST",
 
@@ -98,7 +98,7 @@ function AdminProductForm({ mode, product, onBack }) {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/update_product/${product[0]}`,
+        `${import.meta.env.VITE_APP_URL}/update_product/${product[0]}`,
         {
           method: "PATCH",
 
