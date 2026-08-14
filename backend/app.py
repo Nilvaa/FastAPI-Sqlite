@@ -5,9 +5,11 @@ from pydantic import BaseModel
 from user_auth import router, decode_verify_token
 from cart import cart_router
 from database import get_connection
-
+import os
 app=FastAPI()
 
+
+os.makedirs("uploads",exist_ok=True)
 app.mount("/uploads",StaticFiles(directory="uploads"),name="uploads")
 app.add_middleware(
      CORSMiddleware,
