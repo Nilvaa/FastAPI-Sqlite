@@ -46,7 +46,7 @@ def user_login(
     cursor = connection.cursor()
 
     cursor.execute(
-        "SELECT id, username, password_hash,role FROM users WHERE username=%s",
+        "SELECT id, username, password_hash, role FROM users WHERE username=%s",
         (username,)
     )
 
@@ -59,15 +59,19 @@ def user_login(
             detail="Invalid username/password"
         )
 
-    stored_hash = bytes(user_row[2])
+    stored_hash = user_row[2]
+
+    if isinstance(stored_hash, str):
+        stored_hash = stored_hash.encode("utf-8")
+
     password_byte = password.encode("utf-8")
 
     if bcrypt.checkpw(password_byte, stored_hash):
         user_id = user_row[0]
         user_name = user_row[1]
-        user_role=user_row[3]
+        user_role = user_row[3]
 
-        token = generate_token(user_id, user_name,user_role)
+        token = generate_token(user_id, user_name, user_role)
 
         connection.close()
 
@@ -78,6 +82,7 @@ def user_login(
         }
 
     connection.close()
+
     raise HTTPException(
         status_code=401,
         detail="Invalid username/password"
